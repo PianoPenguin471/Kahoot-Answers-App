@@ -9,7 +9,7 @@ class QuestionAnswer {
 }
 
 export default function App() {
-  const [gameId, setId] = useState();
+  const [gameId, setId] = useState('');
   const [answers, setAnswers] = useState();
   const [questionNum, setQuestionNum] = useState(0);
   const getAnswers = () => {
@@ -19,7 +19,7 @@ export default function App() {
       var questions = json.questions;
       for (var index = 0; index < questions.length; index++) {
         var question = questions[index]
-        if (question.type === "quiz") {
+        if (question.type === "quiz" || question.type === "multiple_select_quiz") {
           var correctColors = []          
           for (var i = 0; i < colors.length; i++) {
             if (question.choices[i].correct) {
@@ -41,10 +41,17 @@ export default function App() {
         }
       }
       setAnswers(outputArr)
-    }))).catch(e=>alert(e))
+    }))).catch(e=>{
+      console.error(e)
+      alert(e)
+    })
   }
   const getAnswersForDisplay = () => {
     if (answers != null && questionNum != null) {
+      if (questionNum > answers.length - 1) {
+        setQuestionNum(0)
+        return "No more questions"
+      }
       var questionType = answers[questionNum].questionType
       var questionAnswers = answers[questionNum].correctAnswers
       var questionNumber = questionNum + 1
@@ -87,6 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative'
   },
   input: {
     height: 40,
@@ -96,6 +104,13 @@ const styles = StyleSheet.create({
     borderRadius: 5
   },
   nextButton: {
-    marginLeft: 50
+    flex: 1,
+    flexDirection:'row',
+    position:'absolute',
+    justifyContent: "space-between",
+    backgroundColor: "transparent",
+    borderWidth: 0.5,
+    borderRadius: 20,
+    right: 50
   }
 });
